@@ -18,4 +18,4 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class PuntoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Point
-        fields = ('id', 'lat', 'lon', 'secuence', 'created_by', 'created_at', 'age', 'sex', 'ability', 'score')
+        fields = ('id', 'lat', 'lon', 'hdop', 'secuence', 'secuence_end', 'created_by', 'created_at', 'age', 'sex', 'ability', 'score', 'version')

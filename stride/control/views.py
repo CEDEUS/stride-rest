@@ -38,6 +38,8 @@ class PuntoViewSet(viewsets.ModelViewSet):
     queryset = Point.objects.all()
     serializer_class = PuntoSerializer
 
+    my_filter_fields = ('lat', 'lon', 'created_by', 'created_at', 'hdop', 'age', 'sex', 'ability', 'version', 'secuence')
+
     def create(self, request, *args, **kwargs):
         is_many = isinstance(request.data, list)
         if not is_many:
@@ -48,6 +50,24 @@ class PuntoViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def get_kwargs_for_filtering(self):
+        filtering_kwargs = {} 
+
+        for field in  self.my_filter_fields:
+            field_value = self.request.query_params.get(field)
+            if field_value: 
+                filtering_kwargs[field] = field_value
+        return filtering_kwargs 
+
+    def get_queryset(self):
+        queryset = Point.objects.all() 
+
+        filtering_kwargs = self.get_kwargs_for_filtering() 
+        if filtering_kwargs:
+            queryset = Point.objects.filter(**filtering_kwargs)
+
+        return queryset
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -63,3 +83,19 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email
         })
+
+class DanielViewSet(viewsets.ModelViewSet):
+
+    queryset = Point.objects.all()
+    serializer_class = PuntoSerializer
+
+    def create(self, request, *args, **kwargs):
+        is_many = isinstance(request.data, list)
+        if not is_many:
+            return super(PuntoViewSet, self).create(request, *args, **kwargs)
+        else:
+            serializer = self.get_serializer(data=request.data, many=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
