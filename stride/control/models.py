@@ -30,3 +30,19 @@ class Point(models.Model):
 
     def __unicode__(self):
         return '{} {} {}'.format(self.created_by.username, self.lon, self.lat)
+
+class Observed(models.Model):
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    age = models.PositiveIntegerField(default=0)
+    sex = models.CharField(max_length=2, default='N')
+    ability = models.CharField(max_length=2, default='')
+    version = models.CharField(max_length=30, default='0.0.1', blank=True, null=True)
+
+class Data(models.Model):
+    observed = models.ForeignKey(Observed, related_name='data', on_delete=models.SET_NULL, null=True)
+    lat = models.DecimalField(max_digits=20, decimal_places=7)
+    lon = models.DecimalField(max_digits=20, decimal_places=7)
+    score = models.CharField(max_length=2, default='')
+    hdop = models.FloatField(default=0.0, blank=True, null=True)

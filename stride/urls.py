@@ -25,6 +25,7 @@ router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'points', views.PuntoViewSet)
 router.register(r'daniel', views.DanielViewSet)
+router.register(r'observed', views.ObservedViewSet)
 
 
 urlpatterns = [

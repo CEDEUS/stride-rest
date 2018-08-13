@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from stride.control.models import Point
-from stride.control.serializers import UserSerializer, GroupSerializer, PuntoSerializer
+from stride.control.models import Point, Observed, Data
+from stride.control.serializers import UserSerializer, GroupSerializer, PuntoSerializer, DataSerializer, ObservedSerializer
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -99,3 +99,16 @@ class DanielViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+class ObservedViewSet(viewsets.ModelViewSet):
+
+    queryset = Observed.objects.all()
+    serializer_class = ObservedSerializer
+
+    def create(self, request, *args, **kwargs):
+        #request.data['user'] = request.user
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
