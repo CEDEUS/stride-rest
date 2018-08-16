@@ -6,7 +6,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        fields = ('username', 'email', 'groups')
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -21,14 +21,15 @@ class PuntoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'lat', 'lon', 'hdop', 'secuence', 'secuence_end', 'created_by', 'created_at', 'age', 'sex', 'ability', 'score', 'version')
 
 
-class DataSerializer(serializers.HyperlinkedModelSerializer):
+class DataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
         fields = ('id', 'observed', 'lat', 'lon', 'score', 'hdop')
 
 
-class ObservedSerializer(serializers.HyperlinkedModelSerializer):
+class ObservedSerializer(serializers.ModelSerializer):
     data = DataSerializer(many=True)
+    created_by = UserSerializer(read_only=True)
 
     class Meta:
         model = Observed
@@ -36,7 +37,6 @@ class ObservedSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         list_data = validated_data.pop('data')
-        #user = validated_data.pop('user')
         user =  self.context['request'].user
         validated_data['created_by'] = user
         instance = Observed.objects.create(**validated_data)

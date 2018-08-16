@@ -106,7 +106,6 @@ class ObservedViewSet(viewsets.ModelViewSet):
     serializer_class = ObservedSerializer
 
     def create(self, request, *args, **kwargs):
-        #request.data['user'] = request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
