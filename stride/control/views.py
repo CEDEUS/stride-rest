@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from rest_framework.authentication import TokenAuthentication
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework import status
@@ -102,8 +103,13 @@ class DanielViewSet(viewsets.ModelViewSet):
 
 class ObservedViewSet(viewsets.ModelViewSet):
 
+    authentication_classes = (TokenAuthentication, JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     queryset = Observed.objects.all()
     serializer_class = ObservedSerializer
+
+    my_filter_fields = ('created_by', 'created_at', 'age', 'sex', 'ability', 'version', 'created_by__username', 'created_at__gte', 'created_at__lte', 'created_at__gt', 'created_at__lt')
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -111,3 +117,21 @@ class ObservedViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def get_kwargs_for_filtering(self):
+        filtering_kwargs = {} 
+
+        for field in  self.my_filter_fields:
+            field_value = self.request.query_params.get(field)
+            if field_value: 
+                filtering_kwargs[field] = field_value
+        return filtering_kwargs 
+
+    def get_queryset(self):
+        queryset = Observed.objects.all() 
+
+        filtering_kwargs = self.get_kwargs_for_filtering() 
+        if filtering_kwargs:
+            queryset = Observed.objects.filter(**filtering_kwargs)
+
+        return queryset

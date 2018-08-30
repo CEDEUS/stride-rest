@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -46,3 +47,32 @@ class Data(models.Model):
     lon = models.DecimalField(max_digits=20, decimal_places=7)
     score = models.CharField(max_length=2, default='')
     hdop = models.FloatField(default=0.0, blank=True, null=True)
+
+
+class Delete(models.Model):
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(null=True, blank=True)
+    age = models.PositiveIntegerField(null=True, blank=True)
+    sex = models.CharField(max_length=2, null=True, blank=True)
+    ability = models.CharField(max_length=2, null=True, blank=True)
+    version = models.CharField(max_length=30, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        observed = Observed.objects.all()
+        if self.created_by:
+            observed = observed.filter(created_by=self.created_by)
+        if self.created_at:
+            observed = observed.filter(created_at=self.created_at) # Revisar que fecha no compare por la hora sino que solo por el dia
+        if self.age:
+            observed = observed.filter(age=self.age)
+        if self.sex:
+            observed = observed.filter(sex=self.sex)
+        if self.ability:
+            observed = observed.filter(ability=self.ability)
+        if self.version:
+            observed = observed.filter(version=version)
+        if observed != Observed.objects.all():
+            for element in observed:
+                element.delete()
+        super(Delete, self).save()
+
