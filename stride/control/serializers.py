@@ -1,18 +1,65 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model, authenticate
 from stride.control.models import Point, Observed, Data
 from rest_framework import serializers
 
+from djoser import constants, utils
+from djoser.compat import get_user_email, get_user_email_field_name
+from djoser.conf import settings
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+from datetime import datetime, timedelta, time
+
+User = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    total_observed_person = serializers.SerializerMethodField()
+    total_points_voted = serializers.SerializerMethodField()
+    today_observed_person = serializers.SerializerMethodField()
+    days_surveyed = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('username', 'email', 'groups')
+        fields = tuple(User.REQUIRED_FIELDS) + (
+            User._meta.pk.name,
+            User.USERNAME_FIELD,
+            'date_joined',
+            'groups',
+            'total_observed_person',
+            'total_points_voted',
+            'today_observed_person',
+            'days_surveyed',
+        )
+        read_only_fields = (User.USERNAME_FIELD, 'total_observed_person', 'total_points_voted', 'today_observed_person', 'date_joined', 'groups', 'days_surveyed')
 
+    def get_total_observed_person(self, obj):
+        return len(Observed.objects.filter(created_by=obj))
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name')
+    def get_today_observed_person(self, obj):
+        today = datetime.now().date()
+        tomorrow = today + timedelta(1)
+        today_start = datetime.combine(today, time())
+        today_end = datetime.combine(tomorrow, time())
+        return len(Observed.objects.filter(created_by=obj, created_at__lte=today_end, created_at__gte=today_start))
+
+    def get_total_points_voted(self, obj):
+        return len(Data.objects.filter(observed__created_by=obj))
+
+    def get_days_surveyed(self, obj):
+        obs = Observed.objects.filter(created_by=obj)
+        days = list()
+        for ob in obs:
+            days.append(ob.created_at.date())
+        return len(list(set(days)))
+
+    def update(self, instance, validated_data):
+        email_field = get_user_email_field_name(User)
+        if settings.SEND_ACTIVATION_EMAIL and email_field in validated_data:
+            instance_email = get_user_email(instance)
+            if instance_email != validated_data[email_field]:
+                instance.is_active = False
+                instance.save(update_fields=['is_active'])
+        return super(UserSerializer, self).update(instance, validated_data)
 
 
 class PuntoSerializer(serializers.HyperlinkedModelSerializer):

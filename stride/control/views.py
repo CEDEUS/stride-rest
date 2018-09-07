@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from stride.control.models import Point, Observed, Data
-from stride.control.serializers import UserSerializer, GroupSerializer, PuntoSerializer, DataSerializer, ObservedSerializer
+from stride.control.serializers import PuntoSerializer, DataSerializer, ObservedSerializer
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -13,22 +13,6 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework import status
 from rest_framework.response import Response
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
 
 
 class PuntoViewSet(viewsets.ModelViewSet):
@@ -53,18 +37,18 @@ class PuntoViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_kwargs_for_filtering(self):
-        filtering_kwargs = {} 
+        filtering_kwargs = {}
 
         for field in  self.my_filter_fields:
             field_value = self.request.query_params.get(field)
-            if field_value: 
+            if field_value:
                 filtering_kwargs[field] = field_value
-        return filtering_kwargs 
+        return filtering_kwargs
 
     def get_queryset(self):
-        queryset = Point.objects.all() 
+        queryset = Point.objects.all()
 
-        filtering_kwargs = self.get_kwargs_for_filtering() 
+        filtering_kwargs = self.get_kwargs_for_filtering()
         if filtering_kwargs:
             queryset = Point.objects.filter(**filtering_kwargs)
 
@@ -119,18 +103,18 @@ class ObservedViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_kwargs_for_filtering(self):
-        filtering_kwargs = {} 
+        filtering_kwargs = {}
 
         for field in  self.my_filter_fields:
             field_value = self.request.query_params.get(field)
-            if field_value: 
+            if field_value:
                 filtering_kwargs[field] = field_value
-        return filtering_kwargs 
+        return filtering_kwargs
 
     def get_queryset(self):
-        queryset = Observed.objects.all() 
+        queryset = Observed.objects.all()
 
-        filtering_kwargs = self.get_kwargs_for_filtering() 
+        filtering_kwargs = self.get_kwargs_for_filtering()
         if filtering_kwargs:
             queryset = Observed.objects.filter(**filtering_kwargs)
 

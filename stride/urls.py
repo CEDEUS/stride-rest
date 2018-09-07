@@ -1,20 +1,5 @@
-"""stride URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
@@ -23,11 +8,11 @@ from rest_framework import routers
 from stride.control import views
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
 router.register(r'points', views.PuntoViewSet)
 router.register(r'daniel', views.DanielViewSet)
 router.register(r'observed', views.ObservedViewSet)
+
+admin.autodiscover()
 
 
 urlpatterns = [
@@ -37,4 +22,6 @@ urlpatterns = [
     url(r'^api-token-auth/', views.CustomAuthToken.as_view()),
     url(r'^obtain_token/', obtain_jwt_token),
     url(r'^refresh_token/', refresh_jwt_token),
+    re_path(r'^api/', include('djoser.urls')),
+    re_path(r'^api/', include('djoser.urls.jwt')),
 ]

@@ -70,9 +70,12 @@ class Delete(models.Model):
         if self.ability:
             observed = observed.filter(ability=self.ability)
         if self.version:
-            observed = observed.filter(version=version)
+            observed = observed.filter(version=self.version)
+
         if observed != Observed.objects.all():
             for element in observed:
+                for data in Data.objects.filter(observed=element):
+                    data.delete()
                 element.delete()
         super(Delete, self).save()
 
