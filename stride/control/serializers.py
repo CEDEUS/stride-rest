@@ -71,7 +71,7 @@ class PuntoSerializer(serializers.HyperlinkedModelSerializer):
 class DataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
-        fields = ('id', 'observed', 'lat', 'lon', 'score', 'hdop')
+        fields = ('id', 'observed', 'category', 'lat', 'lon', 'score', 'hdop')
 
 
 class ObservedSerializer(serializers.ModelSerializer):

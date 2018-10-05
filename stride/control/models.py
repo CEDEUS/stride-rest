@@ -47,7 +47,7 @@ class Data(models.Model):
     lon = models.DecimalField(max_digits=20, decimal_places=7)
     score = models.CharField(max_length=2, default='')
     hdop = models.FloatField(default=0.0, blank=True, null=True)
-
+    category = models.CharField(max_length=42, blank=True, null=True, default='None')
 
 class Delete(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
