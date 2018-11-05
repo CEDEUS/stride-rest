@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from stride.control.models import Point, Observed, Data
-from stride.control.serializers import PuntoSerializer, DataSerializer, ObservedSerializer
+from stride.control.serializers import PuntoSerializer, DataSerializer, ObservedSerializer, MyDataSerializer
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -119,3 +119,34 @@ class ObservedViewSet(viewsets.ModelViewSet):
             queryset = Observed.objects.filter(**filtering_kwargs)
 
         return queryset
+
+class MyDataViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = (TokenAuthentication, JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    queryset = Data.objects.all()
+    serializer_class = MyDataSerializer
+
+    my_filter_fields = ('count',)
+
+    def get_kwargs_for_filtering(self):
+        filtering_kwargs = {}
+
+        for field in  self.my_filter_fields:
+            field_value = self.request.query_params.get(field)
+            if field_value:
+                filtering_kwargs[field] = field_value
+        return filtering_kwargs
+
+    def get_queryset(self):
+        queryset = Data.objects.all()
+        last_count = 200
+
+        filtering_kwargs = self.get_kwargs_for_filtering()
+        if filtering_kwargs:
+            last_count = int(filtering_kwargs['count'])
+        queryset = queryset.filter(observed__created_by=self.request.user)[:last_count]
+
+        return queryset
+

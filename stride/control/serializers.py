@@ -17,6 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
     total_points_voted = serializers.SerializerMethodField()
     today_observed_person = serializers.SerializerMethodField()
     days_surveyed = serializers.SerializerMethodField()
+    today_points = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -29,8 +30,9 @@ class UserSerializer(serializers.ModelSerializer):
             'total_points_voted',
             'today_observed_person',
             'days_surveyed',
+            'today_points',
         )
-        read_only_fields = (User.USERNAME_FIELD, 'total_observed_person', 'total_points_voted', 'today_observed_person', 'date_joined', 'groups', 'days_surveyed')
+        read_only_fields = (User.USERNAME_FIELD, 'total_observed_person', 'total_points_voted', 'today_observed_person', 'date_joined', 'groups', 'days_surveyed', 'today_points')
 
     def get_total_observed_person(self, obj):
         return len(Observed.objects.filter(created_by=obj))
@@ -52,6 +54,17 @@ class UserSerializer(serializers.ModelSerializer):
             days.append(ob.created_at.date())
         return len(list(set(days)))
 
+    def get_today_points(self, obj):
+        today = datetime.now().date()
+        tomorrow = today + timedelta(1)
+        today_start = datetime.combine(today, time())
+        today_end = datetime.combine(tomorrow, time())
+        count = 0
+        all_observed = Observed.objects.filter(created_by=obj, created_at__lte=today_end, created_at__gte=today_start)
+        for obs in all_observed:
+            count += len(Data.objects.filter(observed=obs))
+        return count
+
     def update(self, instance, validated_data):
         email_field = get_user_email_field_name(User)
         if settings.SEND_ACTIVATION_EMAIL and email_field in validated_data:
@@ -69,6 +82,12 @@ class PuntoSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class DataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Data
+        fields = ('id', 'observed', 'category', 'lat', 'lon', 'score', 'hdop')
+
+
+class MyDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
         fields = ('id', 'observed', 'category', 'lat', 'lon', 'score', 'hdop')
