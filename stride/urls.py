@@ -12,6 +12,7 @@ router.register(r'points', views.PuntoViewSet)
 router.register(r'daniel', views.DanielViewSet)
 router.register(r'observed', views.ObservedViewSet)
 router.register(r'my_last_point', views.MyDataViewSet)
+router.register(r'data', views.DataViewSet)
 admin.autodiscover()
 
 

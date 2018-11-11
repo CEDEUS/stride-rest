@@ -150,3 +150,11 @@ class MyDataViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+class DataViewSet(viewsets.ModelViewSet):
+
+    authentication_classes = (TokenAuthentication, JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    queryset = Data.objects.all()
+    serializer_class = DataSerializer
+
