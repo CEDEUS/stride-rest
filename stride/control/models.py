@@ -49,6 +49,9 @@ class Data(models.Model):
     hdop = models.FloatField(default=0.0, blank=True, null=True)
     category = models.CharField(max_length=42, blank=True, null=True, default='None')
 
+    class Meta:
+        ordering = ('-id',)
+
 class Delete(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(null=True, blank=True)

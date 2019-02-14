@@ -90,6 +90,7 @@ class DataSerializer(serializers.ModelSerializer):
 class MyDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
+        ordering = ('-id',)
         fields = ('id', 'observed', 'category', 'lat', 'lon', 'score', 'hdop')
 
 

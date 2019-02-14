@@ -12,8 +12,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework import status
-from rest_framework.response import Response
-
+from django.shortcuts import render
 
 class PuntoViewSet(viewsets.ModelViewSet):
 
@@ -158,3 +157,11 @@ class DataViewSet(viewsets.ModelViewSet):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
 
+def TablaDatos(request):
+    delete_data = request.GET.get('d', list())
+    delete_data = delete_data if isinstance(delete_data, list) else delete_data.split(',')
+    for delete in delete_data:
+        if len(Data.objects.filter(id=delete)) > 0:
+            Data.objects.get(id=delete).delete()
+    datos = Data.objects.all()
+    return render(request, 'table.html', {'datos': datos})

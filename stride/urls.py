@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^refresh_token/', refresh_jwt_token),
     re_path(r'^api/', include('djoser.urls')),
     re_path(r'^api/', include('djoser.urls.jwt')),
+    url(r'tabla/', views.TablaDatos),
 ]
