@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
-from stride.control.models import Point, Observed, Data
+from stride.control.models import Point, Observed, Data, UserStadistic
 from rest_framework import serializers
 
 from djoser import constants, utils
@@ -7,6 +7,7 @@ from djoser.compat import get_user_email, get_user_email_field_name
 from djoser.conf import settings
 
 from datetime import datetime, timedelta, time
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -42,6 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
         tomorrow = today + timedelta(1)
         today_start = datetime.combine(today, time())
         today_end = datetime.combine(tomorrow, time())
+        stadistic, created = UserStadistic.objects.get_or_create(user=obj, tag='today_observed_person')
         return len(Observed.objects.filter(created_by=obj, created_at__lte=today_end, created_at__gte=today_start))
 
     def get_total_points_voted(self, obj):
@@ -94,13 +96,21 @@ class MyDataSerializer(serializers.ModelSerializer):
         fields = ('id', 'observed', 'category', 'lat', 'lon', 'score', 'hdop')
 
 
+class UsernameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = tuple(User.REQUIRED_FIELDS)+ (User.USERNAME_FIELD,)
+        read_only_fields = (User.USERNAME_FIELD, )
+
+
 class ObservedSerializer(serializers.ModelSerializer):
     data = DataSerializer(many=True)
-    created_by = UserSerializer(read_only=True)
+    created_by = UsernameSerializer(read_only=True)
 
     class Meta:
         model = Observed
         fields = ('id', 'created_by', 'created_at', 'updated_at', 'age', 'sex', 'ability', 'version', 'data')
+
 
     def create(self, validated_data):
         list_data = validated_data.pop('data')

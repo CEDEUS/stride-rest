@@ -13,6 +13,7 @@ router.register(r'daniel', views.DanielViewSet)
 router.register(r'observed', views.ObservedViewSet)
 router.register(r'my_last_point', views.MyDataViewSet)
 router.register(r'data', views.DataViewSet)
+router.register(r'observednp', views.ObservedViewSetNoPagination)
 admin.autodiscover()
 
 
@@ -26,4 +27,5 @@ urlpatterns = [
     re_path(r'^api/', include('djoser.urls')),
     re_path(r'^api/', include('djoser.urls.jwt')),
     url(r'tabla/', views.TablaDatos),
+    url(r'csv/', views.csvResponse),
 ]

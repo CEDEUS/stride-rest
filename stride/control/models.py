@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
+from django.utils import timezone
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -13,7 +14,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
 
-
+#Deprecated
 class Point(models.Model):
     lat = models.DecimalField(max_digits=20, decimal_places=7)
     lon = models.DecimalField(max_digits=20, decimal_places=7)
@@ -52,6 +53,7 @@ class Data(models.Model):
     class Meta:
         ordering = ('-id',)
 
+# Deprecated
 class Delete(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(null=True, blank=True)
@@ -82,3 +84,9 @@ class Delete(models.Model):
                 element.delete()
         super(Delete, self).save()
 
+
+class UserStadistic(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    tag = models.CharField(max_length=100)
+    value = models.PositiveIntegerField(null=True, blank=True)
+    last_update = models.DateTimeField(default=timezone.now())
