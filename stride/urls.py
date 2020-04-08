@@ -24,6 +24,8 @@ urlpatterns = [
     url(r'^api-token-auth/', views.CustomAuthToken.as_view()),
     url(r'^obtain_token/', obtain_jwt_token),
     url(r'^refresh_token/', refresh_jwt_token),
+    re_path(r'^auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.jwt')),
     re_path(r'^api/', include('djoser.urls')),
     re_path(r'^api/', include('djoser.urls.jwt')),
     url(r'tabla/', views.TablaDatos),

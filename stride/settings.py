@@ -51,6 +51,25 @@ INSTALLED_APPS = [
     'djoser',
 ]
 
+LOGGING = {
+            'version': 1,
+                'disable_existing_loggers': False,
+                    'handlers': {
+                                'file': {
+                                                'level': 'DEBUG',
+                                                            'class': 'logging.FileHandler',
+                                                                        'filename': '/home/fuentescri/debug.log',
+                                                                                },
+                                    },
+                        'loggers': {
+                                    'django': {
+                                                    'handlers': ['file'],
+                                                                'level': 'DEBUG',
+                                                                            'propagate': True,
+                                                                                    },
+                                        },
+                        }
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -145,10 +164,11 @@ STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        #'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
     'TEST_REQUEST_RENDERER_CLASSES': (
         'rest_framework.renderers.MultiPartRenderer',
@@ -166,6 +186,11 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': timedelta(days=1),
     'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
     'JWT_AUTH_COOKIE': 'JWT',
+    'AUTH_HEADER_TYPES': ('JWT', 'Bearer'),
+}
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
 
 DJOSER = {

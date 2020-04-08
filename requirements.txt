@@ -3,5 +3,5 @@ djangorestframework==3.8.2
 Pillow==5.2.0
 django-cors-headers==2.4.0
 djangorestframework-jwt==1.11.0
-djoser==1.2.1
+djoser
 django-import-export==1.0.1

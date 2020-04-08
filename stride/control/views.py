@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from rest_framework import status
 from django.shortcuts import render
@@ -93,7 +94,7 @@ class DanielViewSet(viewsets.ModelViewSet):
 
 class ObservedViewSet(viewsets.ModelViewSet):
 
-    authentication_classes = (TokenAuthentication, JSONWebTokenAuthentication,)
+    authentication_classes = (TokenAuthentication, JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     queryset = Observed.objects.all()
@@ -142,7 +143,7 @@ class ObservedViewSetNoPagination(ObservedViewSet):
 
 class MyDataViewSet(viewsets.ModelViewSet):
 
-    authentication_classes = (TokenAuthentication, JSONWebTokenAuthentication,)
+    authentication_classes = (TokenAuthentication, JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     queryset = Data.objects.all()
@@ -173,7 +174,7 @@ class MyDataViewSet(viewsets.ModelViewSet):
 
 class DataViewSet(viewsets.ModelViewSet):
 
-    authentication_classes = (TokenAuthentication, JSONWebTokenAuthentication,)
+    authentication_classes = (TokenAuthentication, JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     queryset = Data.objects.all()
